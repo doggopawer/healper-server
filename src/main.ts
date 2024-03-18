@@ -1,7 +1,10 @@
 import { Sequelize } from "sequelize";
+import { config } from "./config";
 
-const sequelize = new Sequelize("healper", "root", "xxxx", {
-  host: "localhost",
+const { host, user, password, database } = config.db;
+
+const sequelize = new Sequelize(database as string, user as string, password, {
+  host,
   dialect: "mysql",
 });
 
