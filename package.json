@@ -14,5 +14,9 @@
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.0",
     "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "mysql2": "^3.9.2",
+    "sequelize": "^6.37.1"
   }
 }
