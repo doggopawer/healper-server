@@ -16,6 +16,7 @@
     "typescript": "^5.4.2"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "mysql2": "^3.9.2",
     "sequelize": "^6.37.1"
   }
