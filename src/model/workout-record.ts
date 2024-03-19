@@ -19,5 +19,5 @@ export const WorkoutRecord = sequelize.define("WorkoutRecord", {
     allowNull: false,
   },
 });
-WorkoutRecord.belongsTo(RoutineRecord);
-WorkoutRecord.belongsTo(User);
+WorkoutRecord.belongsTo(RoutineRecord, { foreignKey: "routineRecordId" });
+WorkoutRecord.belongsTo(User, { foreignKey: "userId" });

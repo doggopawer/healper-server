@@ -26,4 +26,4 @@ export const SetConfig = sequelize.define("SetConfig", {
     allowNull: false,
   },
 });
-SetConfig.belongsTo(WorkoutConfig);
+SetConfig.belongsTo(WorkoutConfig, { foreignKey: "workoutConfigId" });

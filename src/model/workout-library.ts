@@ -18,4 +18,4 @@ export const WorkoutLibrary = sequelize.define("WorkoutLibrary", {
     allowNull: false,
   },
 });
-WorkoutLibrary.belongsTo(User);
+WorkoutLibrary.belongsTo(User, { foreignKey: "userId" });

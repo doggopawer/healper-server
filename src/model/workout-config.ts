@@ -18,4 +18,4 @@ export const WorkoutConfig = sequelize.define("WorkoutConfig", {
     allowNull: false,
   },
 });
-WorkoutConfig.belongsTo(RoutineConfig);
+WorkoutConfig.belongsTo(RoutineConfig, { foreignKey: "routineConfigId" });

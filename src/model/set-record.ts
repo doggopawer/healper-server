@@ -26,4 +26,4 @@ export const SetRecord = sequelize.define("SetRecord", {
     allowNull: false,
   },
 });
-SetRecord.belongsTo(WorkoutRecord);
+SetRecord.belongsTo(WorkoutRecord, { foreignKey: "workoutRecordId" });

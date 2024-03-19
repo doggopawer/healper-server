@@ -18,4 +18,4 @@ export const RoutineRecord = sequelize.define("RoutineRecord", {
     allowNull: false,
   },
 });
-RoutineRecord.belongsTo(User);
+RoutineRecord.belongsTo(User, { foreignKey: "userId" });
