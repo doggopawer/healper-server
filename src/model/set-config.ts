@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
-import { WorkoutConfig } from "./WorkoutConfig";
+import { WorkoutConfig } from "./workout-config";
 
 export const SetConfig = sequelize.define("SetConfig", {
   id: {

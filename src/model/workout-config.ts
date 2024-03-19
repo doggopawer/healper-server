@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
-import { User } from "./User";
+import { RoutineConfig } from "./routine-config";
 
-export const RoutineRecord = sequelize.define("RoutineRecord", {
+export const WorkoutConfig = sequelize.define("WorkoutConfig", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -13,9 +13,9 @@ export const RoutineRecord = sequelize.define("RoutineRecord", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  color: {
+  type: {
     type: DataTypes.TEXT,
     allowNull: false,
   },
 });
-RoutineRecord.belongsTo(User);
+WorkoutConfig.belongsTo(RoutineConfig);
