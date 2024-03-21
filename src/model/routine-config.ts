@@ -2,7 +2,6 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
 import { WorkoutConfig } from "./workout-config";
 import { SetConfig } from "./set-config";
-import { RoutineRequest, WorkoutRequest } from "../type";
 
 export const RoutineConfig = sequelize.define("RoutineConfig", {
   id: {
@@ -80,6 +79,35 @@ export async function createOne(
 ) {
   try {
     const data = await RoutineConfig.create(CreateRoutineConfigRequest);
+    return data.dataValues;
+  } catch (err) {
+    throw new Error(err as string);
+  }
+}
+
+type UpdateRoutineConfigRequest = {
+  id: number;
+  name: string;
+  color: string;
+  userId: number;
+};
+export async function updateOne(
+  updateRoutineConfigRequest: UpdateRoutineConfigRequest
+) {
+  const { name, color, id } = updateRoutineConfigRequest;
+  try {
+    const data = await RoutineConfig.findByPk(id);
+
+    if (!data) {
+      throw new Error("not found");
+    }
+
+    data.set({
+      name,
+      color,
+    });
+    await data.save();
+
     return data.dataValues;
   } catch (err) {
     throw new Error(err as string);
