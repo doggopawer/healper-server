@@ -71,3 +71,16 @@ export async function create(routineRequest: RoutineRequest) {
     throw new Error(err as string);
   }
 }
+
+export async function remove(id: number) {
+  try {
+    const data = await RoutineConfig.destroy({
+      where: {
+        id,
+      },
+    });
+    return data;
+  } catch (err) {
+    throw new Error(err as string);
+  }
+}
