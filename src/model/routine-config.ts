@@ -45,6 +45,31 @@ export async function getAllWithSubDetails(userId: number) {
   }
 }
 
+export async function getOneWithSubDetailsById(userId: number, id: number) {
+  try {
+    return await RoutineConfig.findOne({
+      where: {
+        userId,
+        id,
+      },
+      include: [
+        {
+          model: WorkoutConfig,
+          as: "workoutConfigs",
+          include: [
+            {
+              model: SetConfig,
+              as: "setConfigs",
+            },
+          ],
+        },
+      ],
+    });
+  } catch (err) {
+    throw new Error(err as string); // err가 Error 타입임을 가정
+  }
+}
+
 type RoutineConfig = {
   name: string;
   color: string;
