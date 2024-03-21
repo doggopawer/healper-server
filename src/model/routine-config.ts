@@ -20,24 +20,12 @@ export const RoutineConfig = sequelize.define("RoutineConfig", {
   },
 });
 
-export async function getAllWithSubDetails(userId: number) {
+export async function getAll(userId: number) {
   try {
     return await RoutineConfig.findAll({
       where: {
         userId,
       },
-      include: [
-        {
-          model: WorkoutConfig,
-          as: "workoutConfigs",
-          include: [
-            {
-              model: SetConfig,
-              as: "setConfigs",
-            },
-          ],
-        },
-      ],
     });
   } catch (err) {
     throw new Error(err as string); // err가 Error 타입임을 가정
