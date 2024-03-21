@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
 import { WorkoutConfig } from "./workout-config";
+import { SetConfig } from "./set-config";
 
 export const RoutineConfig = sequelize.define("RoutineConfig", {
   id: {
@@ -19,25 +20,22 @@ export const RoutineConfig = sequelize.define("RoutineConfig", {
   },
 });
 
-export async function getAll() {
+export async function getWithSubDetailsByUserId(userId: string) {
   try {
-    const routines = await RoutineConfig.findAll({
+    return await RoutineConfig.findAll({
+      where: {
+        userId,
+      },
       include: [
         {
           model: WorkoutConfig,
-          through: {
-            attributes: [
-              /* list the wanted attributes here */
-            ],
-          },
+          include: [
+            {
+              model: SetConfig,
+            },
+          ],
         },
       ],
-    });
-
-    await WorkoutConfig.findAll({
-      include: {
-        model: RoutineConfig,
-      },
     });
   } catch (err) {
     throw new Error(err as string); // err가 Error 타입임을 가정
