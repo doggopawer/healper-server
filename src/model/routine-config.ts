@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
 import { WorkoutConfig } from "./workout-config";
 import { SetConfig } from "./set-config";
-import { RoutineRequest } from "../type";
+import { RoutineRequest, WorkoutRequest } from "../type";
 
 export const RoutineConfig = sequelize.define("RoutineConfig", {
   id: {
@@ -21,7 +21,7 @@ export const RoutineConfig = sequelize.define("RoutineConfig", {
   },
 });
 
-export async function getWithSubDetailsByUserId(userId: number) {
+export async function getAllWithSubDetails(userId: number) {
   try {
     return await RoutineConfig.findAll({
       where: {
