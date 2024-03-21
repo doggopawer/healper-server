@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
-import { User } from "./User";
+import { User } from "./user";
 
 export const RoutineConfig = sequelize.define("RoutineConfig", {
   id: {
@@ -18,6 +18,26 @@ export const RoutineConfig = sequelize.define("RoutineConfig", {
     allowNull: false,
   },
 });
-RoutineConfig.belongsTo(User);
+RoutineConfig.belongsTo(User, { foreignKey: "userId" });
 
-console.log("실행 됨?"); // 이코드가 실행이 안되는것으로 보아 RoutineConfig.ts는 실행 조차 안되고 있다.
+export async function getAll() {
+  try {
+    return RoutineConfig.findAll();
+  } catch (err) {
+    throw new Error(err as string);
+  }
+}
+
+type RoutineConfig = {
+  name: string;
+  color: string;
+  userId: number;
+};
+export async function create({ name, color, userId }: RoutineConfig) {
+  try {
+    const data = await RoutineConfig.create({ name, color, userId });
+    return data.dataValues;
+  } catch (err) {
+    throw new Error(err as string);
+  }
+}
