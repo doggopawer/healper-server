@@ -70,27 +70,16 @@ export async function getOneWithSubDetailsById(userId: number, id: number) {
   }
 }
 
-type RoutineConfig = {
+type CreateRoutineConfigRequest = {
   name: string;
   color: string;
   userId: number;
 };
-export async function create(routineRequest: RoutineRequest) {
+export async function createOne(
+  CreateRoutineConfigRequest: CreateRoutineConfigRequest
+) {
   try {
-    const data = await RoutineConfig.create(routineRequest, {
-      include: [
-        {
-          model: WorkoutConfig,
-          as: "workoutConfigs",
-          include: [
-            {
-              model: SetConfig,
-              as: "setConfigs",
-            },
-          ],
-        },
-      ],
-    });
+    const data = await RoutineConfig.create(CreateRoutineConfigRequest);
     return data.dataValues;
   } catch (err) {
     throw new Error(err as string);
