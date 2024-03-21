@@ -86,7 +86,7 @@ export async function createOne(
   }
 }
 
-export async function remove(id: number) {
+export async function deleteOne(id: number) {
   try {
     const data = await RoutineConfig.destroy({
       where: {
