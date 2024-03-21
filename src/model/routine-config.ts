@@ -2,6 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
 import { WorkoutConfig } from "./workout-config";
 import { SetConfig } from "./set-config";
+import { RoutineRequest } from "../type";
 
 export const RoutineConfig = sequelize.define("RoutineConfig", {
   id: {
@@ -20,7 +21,7 @@ export const RoutineConfig = sequelize.define("RoutineConfig", {
   },
 });
 
-export async function getWithSubDetailsByUserId(userId: string) {
+export async function getWithSubDetailsByUserId(userId: number) {
   try {
     return await RoutineConfig.findAll({
       where: {
@@ -29,9 +30,11 @@ export async function getWithSubDetailsByUserId(userId: string) {
       include: [
         {
           model: WorkoutConfig,
+          as: "workoutConfigs",
           include: [
             {
               model: SetConfig,
+              as: "setConfigs",
             },
           ],
         },
@@ -47,9 +50,22 @@ type RoutineConfig = {
   color: string;
   userId: number;
 };
-export async function create({ name, color, userId }: RoutineConfig) {
+export async function create(routineRequest: RoutineRequest) {
   try {
-    const data = await RoutineConfig.create({ name, color, userId });
+    const data = await RoutineConfig.create(routineRequest, {
+      include: [
+        {
+          model: WorkoutConfig,
+          as: "workoutConfigs",
+          include: [
+            {
+              model: SetConfig,
+              as: "setConfigs",
+            },
+          ],
+        },
+      ],
+    });
     return data.dataValues;
   } catch (err) {
     throw new Error(err as string);
