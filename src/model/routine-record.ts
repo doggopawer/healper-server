@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
-import { User } from "./user";
 
 export const RoutineRecord = sequelize.define("RoutineRecord", {
   id: {
@@ -18,4 +17,3 @@ export const RoutineRecord = sequelize.define("RoutineRecord", {
     allowNull: false,
   },
 });
-RoutineRecord.belongsTo(User, { foreignKey: "userId" });

@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
-import { User } from "./user";
 
 export const WorkoutLibrary = sequelize.define("WorkoutLibrary", {
   id: {
@@ -18,4 +17,3 @@ export const WorkoutLibrary = sequelize.define("WorkoutLibrary", {
     allowNull: false,
   },
 });
-WorkoutLibrary.belongsTo(User, { foreignKey: "userId" });

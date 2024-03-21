@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
-import { RoutineConfig } from "./routine-config";
 
 export const WorkoutConfig = sequelize.define("WorkoutConfig", {
   id: {
@@ -18,4 +17,10 @@ export const WorkoutConfig = sequelize.define("WorkoutConfig", {
     allowNull: false,
   },
 });
-WorkoutConfig.belongsTo(RoutineConfig, { foreignKey: "routineConfigId" });
+
+export const create = async (name: string, type: string) => {
+  // 운동설정 데이터를 추가하는 메소드 불러오기
+  const data = await WorkoutConfig.create({ name, type });
+  // 생성된 운동설정 데이터 반환하기
+  return data.dataValues;
+};

@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db";
-import { WorkoutConfig } from "./workout-config";
 
 export const SetConfig = sequelize.define("SetConfig", {
   id: {
@@ -26,4 +25,10 @@ export const SetConfig = sequelize.define("SetConfig", {
     allowNull: false,
   },
 });
-SetConfig.belongsTo(WorkoutConfig, { foreignKey: "workoutConfigId" });
+
+// export const create = async (order) => {
+//   // 운동설정 데이터를 추가하는 메소드 불러오기
+//   const data = await SetConfig.create({ order, weight, rep, restSec });
+//   // 생성된 운동설정 데이터 반환하기
+//   return data.dataValues;
+// };
