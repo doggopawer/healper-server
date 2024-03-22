@@ -12,6 +12,10 @@ export const WorkoutRecord = sequelize.define("WorkoutRecord", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  workoutImage: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
   type: {
     type: DataTypes.TEXT,
     allowNull: false,

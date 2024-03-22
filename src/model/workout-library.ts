@@ -12,6 +12,14 @@ export const WorkoutLibrary = sequelize.define("WorkoutLibrary", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  workoutImage: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  searchKeyword: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
   type: {
     type: DataTypes.TEXT,
     allowNull: false,
