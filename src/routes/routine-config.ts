@@ -5,7 +5,7 @@ import { isAuth } from "../middleware";
 const router = express.Router();
 
 router.get("/", isAuth, RoutineConfigController.getRoutineConfigs);
-router.get("/:id");
+router.get("/:id", isAuth, RoutineConfigController.getRoutineConfig);
 router.post("/", isAuth, RoutineConfigController.createRoutineConfig);
 router.put("/:id");
 router.delete("/:id");
