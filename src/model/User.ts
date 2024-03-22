@@ -16,7 +16,7 @@ export const User = sequelize.define("User", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  nickname: {
+  name: {
     type: DataTypes.TEXT,
     allowNull: false,
   },
@@ -30,13 +30,36 @@ export const User = sequelize.define("User", {
   },
 }) as ModelCtor<any>;
 
-export const getOneById = (id: string) => {
+export const getOneById = async (providerId: string) => {
   try {
     return User.findOne({
       where: {
-        id,
+        providerId,
       },
     });
+  } catch (err) {
+    throw new Error(err as string);
+  }
+};
+
+type CreateUserRequest = {
+  id: string;
+  email: string;
+  name: string;
+  picture: string;
+};
+
+export const createOne = async (createUserRequest: CreateUserRequest) => {
+  const { id, email, name, picture } = createUserRequest;
+  try {
+    const data = await User.create({
+      provider: "Google",
+      providerId: id,
+      name,
+      email,
+      profileImage: picture,
+    });
+    return data.dataValues;
   } catch (err) {
     throw new Error(err as string);
   }
