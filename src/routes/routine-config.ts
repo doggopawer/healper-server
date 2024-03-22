@@ -8,6 +8,6 @@ router.get("/", isAuth, RoutineConfigController.getRoutineConfigs);
 router.get("/:id", isAuth, RoutineConfigController.getRoutineConfig);
 router.post("/", isAuth, RoutineConfigController.createRoutineConfig);
 router.put("/:id", isAuth, RoutineConfigController.updateRoutineConfig);
-router.delete("/:id");
+router.delete("/:id", isAuth, RoutineConfigController.deleteRoutineConfig);
 
 export default router;
