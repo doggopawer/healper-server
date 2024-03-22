@@ -1,14 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import * as RoutineConfigRepository from "../model/routine-config";
 
-export async function getAllRoutineConfigs(
+export async function getRoutineConfigs(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const data = await RoutineConfigRepository.getAll(1);
-
-  res.status(200).json(data);
+  try {
+    const { userId } = res.locals;
+    const data = await RoutineConfigRepository.getAll(userId);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 }
 
 export async function createRoutineConfig(
@@ -25,5 +29,7 @@ export async function createRoutineConfig(
       userId,
     });
     res.status(201).json(newRoutineConfig);
-  } catch (err) {}
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 }
