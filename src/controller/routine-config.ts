@@ -48,3 +48,25 @@ export const createRoutineConfig = async (
     res.status(500).json({ error });
   }
 };
+
+export const updateRoutineConfig = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { name, color } = req.body;
+    const { userId } = res.locals;
+    console.log(id, name, color, userId);
+    const newRoutineConfig = await RoutineConfigRepository.updateOne({
+      id: parseInt(id),
+      name,
+      color,
+      userId,
+    });
+    res.status(200).json(newRoutineConfig);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
