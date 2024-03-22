@@ -7,6 +7,10 @@ type Config = {
     password: string | undefined;
     database: string | undefined;
   };
+  jwt: {
+    secretKey: string | undefined;
+    expiresIn: string | undefined;
+  };
   oauth: {
     google: {
       clientId: string | undefined;
@@ -24,6 +28,10 @@ export const config: Config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
+  },
+  jwt: {
+    secretKey: process.env.JWT_SECRET_KEY,
+    expiresIn: process.env.JWT_EXPIRES_IN,
   },
   oauth: {
     google: {
