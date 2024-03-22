@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model, ModelCtor } from "sequelize";
 import { sequelize } from "../db";
 
 export const User = sequelize.define("User", {
@@ -28,4 +28,16 @@ export const User = sequelize.define("User", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-});
+}) as ModelCtor<any>;
+
+export const getOneById = (id: string) => {
+  try {
+    return User.findOne({
+      where: {
+        id,
+      },
+    });
+  } catch (err) {
+    throw new Error(err as string);
+  }
+};
