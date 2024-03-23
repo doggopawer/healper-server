@@ -26,9 +26,45 @@ export const SetConfig = sequelize.define("SetConfig", {
   },
 });
 
-// export const create = async (order) => {
-//   // 운동설정 데이터를 추가하는 메소드 불러오기
-//   const data = await SetConfig.create({ order, weight, rep, restSec });
-//   // 생성된 운동설정 데이터 반환하기
-//   return data.dataValues;
-// };
+export async function getAll(workoutConfigId: number) {
+  try {
+    return await SetConfig.findAll({
+      where: {
+        workoutConfigId,
+      },
+    });
+  } catch (err) {
+    throw new Error(err as string); // err가 Error 타입임을 가정
+  }
+}
+
+type CreateSetConfigRequest = {
+  order: number;
+  weight: number;
+  rep: number;
+  restSec: number;
+  workoutConfigId: string;
+};
+export async function createOne(
+  createSetConfigRequest: CreateSetConfigRequest
+) {
+  try {
+    const data = await SetConfig.create(createSetConfigRequest);
+    return data.dataValues;
+  } catch (err) {
+    throw new Error(err as string);
+  }
+}
+
+export async function deleteOne(id: number) {
+  try {
+    const data = await SetConfig.destroy({
+      where: {
+        id,
+      },
+    });
+    return data;
+  } catch (err) {
+    throw new Error(err as string);
+  }
+}
