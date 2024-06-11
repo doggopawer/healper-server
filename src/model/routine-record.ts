@@ -29,3 +29,16 @@ export async function getAll(userId: number) {
     throw new Error(err as string); // err가 Error 타입임을 가정
   }
 }
+
+export async function getOneById(userId: number, id: number) {
+  try {
+    return await RoutineRecord.findOne({
+      where: {
+        userId, // 해당유저의
+        id, // routineId값이 일치하는 routine을 가져온다.
+      },
+    });
+  } catch (err) {
+    throw new Error(err as string); // err가 Error 타입임을 가정
+  }
+}
