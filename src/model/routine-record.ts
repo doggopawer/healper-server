@@ -58,3 +58,32 @@ export async function createOne(
         throw new Error(err as string);
     }
 }
+
+type UpdateRoutineRecordRequest = {
+    id: number;
+    name: string;
+    color: string;
+    userId: number;
+};
+export async function updateOne(
+    updateRoutineConfigRequest: UpdateRoutineRecordRequest
+) {
+    const { name, color, id } = updateRoutineConfigRequest;
+    try {
+        const data = await RoutineRecord.findByPk(id);
+
+        if (!data) {
+            throw new Error("not found");
+        }
+
+        data.set({
+            name,
+            color,
+        });
+        await data.save();
+
+        return data.dataValues;
+    } catch (err) {
+        throw new Error(err as string);
+    }
+}
