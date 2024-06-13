@@ -14,3 +14,21 @@ export const getRoutineRecordAll = async (
         res.status(500).json({ error });
     }
 };
+
+export const getRoutineConfigOne = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { id } = req.params;
+        const { userId } = res.locals;
+        const data = await RoutineRecordRepository.getOneById(
+            userId,
+            parseInt(id)
+        );
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+};
