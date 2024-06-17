@@ -32,3 +32,22 @@ export const getRoutineConfigOne = async (
         res.status(500).json({ error });
     }
 };
+
+export const createRoutineRecord = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { name, color } = req.body;
+        const { userId } = res.locals;
+        const newRoutineConfig = await RoutineRecordRepository.createOne({
+            name,
+            color,
+            userId,
+        });
+        res.status(201).json(newRoutineConfig);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+};
