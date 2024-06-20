@@ -51,3 +51,24 @@ export const createRoutineRecord = async (
         res.status(500).json({ error });
     }
 };
+
+export const updateRoutineRecord = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { id } = req.params;
+        const { name, color } = req.body;
+        const { userId } = res.locals;
+        const newRoutineConfig = await RoutineRecordRepository.updateOne({
+            id: parseInt(id),
+            name,
+            color,
+            userId,
+        });
+        res.status(200).json(newRoutineConfig);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
