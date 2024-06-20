@@ -72,3 +72,19 @@ export const updateRoutineRecord = async (
         res.status(500).json(error);
     }
 };
+
+export const deleteRoutineRecord = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { id } = req.params;
+        const newRoutineConfig = await RoutineRecordRepository.deleteOne(
+            parseInt(id)
+        );
+        res.status(200).json(newRoutineConfig);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
