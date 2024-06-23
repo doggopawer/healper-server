@@ -8,9 +8,11 @@ export const getRoutineRecordAll = async (
 ) => {
     try {
         const { userId } = res.locals;
+        const { cr } = req.query;
         const data = await RoutineRecordRepository.getAll(userId);
         res.status(200).json(data);
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error });
     }
 };
@@ -33,17 +35,18 @@ export const getRoutineRecordOne = async (
     }
 };
 
-export const createRoutineRecord = async (
+export const createRoutineRecordOne = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try {
-        const { name, color } = req.body;
+        const { name, color, workoutSec } = req.body;
         const { userId } = res.locals;
         const newRoutineConfig = await RoutineRecordRepository.createOne({
             name,
             color,
+            workoutSec,
             userId,
         });
         res.status(201).json(newRoutineConfig);
@@ -52,7 +55,7 @@ export const createRoutineRecord = async (
     }
 };
 
-export const updateRoutineRecord = async (
+export const updateRoutineRecordOne = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -73,7 +76,7 @@ export const updateRoutineRecord = async (
     }
 };
 
-export const deleteRoutineRecord = async (
+export const deleteRoutineRecordOne = async (
     req: Request,
     res: Response,
     next: NextFunction
