@@ -8,8 +8,11 @@ export const getRoutineRecordAll = async (
 ) => {
     try {
         const { userId } = res.locals;
-        const { cr } = req.query;
-        const data = await RoutineRecordRepository.getAll(userId);
+        const { createdAt } = req.query;
+        const data = await RoutineRecordRepository.getAll(
+            userId,
+            createdAt as string
+        );
         res.status(200).json(data);
     } catch (error) {
         console.log(error);

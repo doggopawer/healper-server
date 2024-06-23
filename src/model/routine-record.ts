@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Op } from "sequelize";
 import { sequelize } from "../db";
 
 export const RoutineRecord = sequelize.define("RoutineRecord", {
@@ -22,11 +22,18 @@ export const RoutineRecord = sequelize.define("RoutineRecord", {
     },
 });
 
-export async function getAll(userId: number) {
+export async function getAll(userId: number, createdAt: string) {
     try {
+        const date = new Date(createdAt);
+        const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
         return await RoutineRecord.findAll({
             where: {
                 userId,
+                createdAt: {
+                    [Op.between]: [startOfDay, endOfDay],
+                },
             },
         });
     } catch (err) {
