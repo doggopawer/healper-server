@@ -15,7 +15,7 @@ export const getRoutineRecordAll = async (
     }
 };
 
-export const getRoutineConfigOne = async (
+export const getRoutineRecordOne = async (
     req: Request,
     res: Response,
     next: NextFunction
