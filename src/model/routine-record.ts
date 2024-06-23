@@ -16,6 +16,10 @@ export const RoutineRecord = sequelize.define("RoutineRecord", {
         type: DataTypes.TEXT,
         allowNull: false,
     },
+    workoutSec: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
 });
 
 export async function getAll(userId: number) {
@@ -46,6 +50,7 @@ export async function getOneById(userId: number, id: number) {
 type CreateRoutineRecordRequest = {
     name: string;
     color: string;
+    workoutSec: number;
     userId: number;
 };
 export async function createOne(
