@@ -33,3 +33,20 @@ export async function getAll(routineRecordId: number) {
         throw new Error(err as string); // err가 Error 타입임을 가정
     }
 }
+
+type CreateWorkoutRecordRequest = {
+    name: string;
+    workoutImage: string;
+    type: string;
+    routineRecordId: string;
+};
+export async function createOne(
+    createWorkoutConfigRequest: CreateWorkoutRecordRequest
+) {
+    try {
+        const data = await WorkoutRecord.create(createWorkoutConfigRequest);
+        return data.dataValues;
+    } catch (err) {
+        throw new Error(err as string);
+    }
+}
