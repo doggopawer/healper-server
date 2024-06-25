@@ -17,3 +17,23 @@ export const getWorkoutRecordAll = async (
         res.status(500).json({ error });
     }
 };
+export const createWorkoutRecordOne = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { name, workoutImage, type, routineRecordId } = req.body;
+
+        const newWorkoutRecord = await WorkoutRecordRepository.createOne({
+            name,
+            workoutImage,
+            type,
+            routineRecordId,
+        });
+        res.status(201).json(newWorkoutRecord);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error });
+    }
+};
