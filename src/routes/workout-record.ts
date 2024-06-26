@@ -10,5 +10,6 @@ router.get(
     WorkoutRecordController.getWorkoutRecordAll
 );
 router.post("/", isAuth, WorkoutRecordController.createWorkoutRecordOne);
+router.delete("/:id", isAuth, WorkoutRecordController.deleteWorkoutRecordOne);
 
 export default router;

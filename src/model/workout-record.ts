@@ -50,3 +50,15 @@ export async function createOne(
         throw new Error(err as string);
     }
 }
+export async function deleteOne(id: number) {
+    try {
+        const data = await WorkoutRecord.destroy({
+            where: {
+                id,
+            },
+        });
+        return data;
+    } catch (err) {
+        throw new Error(err as string);
+    }
+}

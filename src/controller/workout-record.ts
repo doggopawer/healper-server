@@ -37,3 +37,17 @@ export const createWorkoutRecordOne = async (
         res.status(500).json({ error });
     }
 };
+
+export const deleteWorkoutRecordOne = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { id } = req.params;
+        const data = await WorkoutRecordRepository.deleteOne(parseInt(id));
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
