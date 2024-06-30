@@ -48,12 +48,12 @@ app.use("/workout-record", WorkoutRecordRouter);
 app.use("/set-record", SetRecordRouter);
 
 sequelize
-  .sync()
-  .then(() => {
-    app.listen(3000, () => {
-      console.log("server is running at 3000");
+    .sync()
+    .then(() => {
+        app.listen(4000, () => {
+            console.log("server is running at 4000");
+        });
+    })
+    .catch(() => {
+        console.error("Unable to connect to the database.");
     });
-  })
-  .catch(() => {
-    console.error("Unable to connect to the database.");
-  });
