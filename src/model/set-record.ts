@@ -1,8 +1,8 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db";
-import { WorkoutRecord } from "./workout-record";
+import { SetRecord as SetRecordType } from "../types/set-record";
 
-export const SetRecord = sequelize.define("SetRecord", {
+export const SetRecord = sequelize.define<Model<SetRecordType>>("SetRecord", {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -25,6 +25,27 @@ export const SetRecord = sequelize.define("SetRecord", {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
+    workoutRecordId: {
+        // userId 속성 추가
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: "workoutrecords",
+            key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    },
 });
 
 export async function getAll(workoutRecordId: number) {
@@ -46,9 +67,7 @@ type CreateSetRecordRequest = {
     restSec: number;
     workoutRecordId: string;
 };
-export async function createOne(
-    createSetRecordRequest: CreateSetRecordRequest
-) {
+export async function createOne(createSetRecordRequest: any) {
     try {
         const data = await SetRecord.create(createSetRecordRequest);
         return data.dataValues;
