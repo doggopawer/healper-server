@@ -1,30 +1,55 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db";
+import { WorkoutLibrary as WorkoutLibraryType } from "../types/workout-library";
 
-export const WorkoutLibrary = sequelize.define("WorkoutLibrary", {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true,
-    },
-    name: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    workoutImage: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    workoutPart: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    type: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-});
+export const WorkoutLibrary = sequelize.define<Model<WorkoutLibraryType>>(
+    "WorkoutLibrary",
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            allowNull: false,
+            primaryKey: true,
+        },
+        name: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        workoutImage: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        workoutPart: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        type: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        userId: {
+            // userId 속성 추가
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "users",
+                key: "id",
+            },
+            onUpdate: "CASCADE",
+            onDelete: "CASCADE",
+        },
+    }
+);
 
 export async function getAll(userId: number, workoutPart: string) {
     try {
@@ -46,9 +71,7 @@ type CreateWorkoutRecordRequest = {
     type: string;
     userId: number;
 };
-export async function createOne(
-    createWorkoutLibraryRequest: CreateWorkoutRecordRequest
-) {
+export async function createOne(createWorkoutLibraryRequest: any) {
     try {
         const data = await WorkoutLibrary.create(createWorkoutLibraryRequest);
         return data.dataValues;
