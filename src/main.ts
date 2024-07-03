@@ -1,13 +1,13 @@
 import { sequelize } from "./db";
 import express from "express";
+import { User } from "./model/user";
+import { WorkoutLibrary } from "./model/workout-library";
 import { RoutineConfig } from "./model/routine-config";
 import { RoutineRecord } from "./model/routine-record";
+import { WorkoutConfig } from "./model/workout-config";
+import { WorkoutRecord } from "./model/workout-record";
 import { SetConfig } from "./model/set-config";
 import { SetRecord } from "./model/set-record";
-import { User } from "./model/user";
-import { WorkoutConfig } from "./model/workout-config";
-import { WorkoutLibrary } from "./model/workout-library";
-import { WorkoutRecord } from "./model/workout-record";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
