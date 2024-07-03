@@ -1,26 +1,51 @@
-import { DataTypes, Op } from "sequelize";
+import { DataTypes, Model, Op } from "sequelize";
 import { sequelize } from "../db";
+import { RoutineRecord as RoutineRecordType } from "../types/routine-record";
 
-export const RoutineRecord = sequelize.define("RoutineRecord", {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true,
-    },
-    name: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    color: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    workoutSec: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
-});
+export const RoutineRecord = sequelize.define<Model<RoutineRecordType>>(
+    "RoutineRecord",
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            allowNull: false,
+            primaryKey: true,
+        },
+        name: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        color: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        workoutSec: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        userId: {
+            // userId 속성 추가
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "users",
+                key: "id",
+            },
+            onUpdate: "CASCADE",
+            onDelete: "CASCADE",
+        },
+    }
+);
 
 export async function getAll(userId: number, createdAt: string) {
     try {
@@ -60,9 +85,7 @@ type CreateRoutineRecordRequest = {
     workoutSec: number;
     userId: number;
 };
-export async function createOne(
-    CreateRoutineConfigRequest: CreateRoutineRecordRequest
-) {
+export async function createOne(CreateRoutineConfigRequest: any) {
     try {
         const data = await RoutineRecord.create(CreateRoutineConfigRequest);
         return data.dataValues;
