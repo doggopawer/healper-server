@@ -1,26 +1,51 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db";
+import { WorkoutRecord as WorkoutRecordType } from "../types/workout-record";
 
-export const WorkoutRecord = sequelize.define("WorkoutRecord", {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true,
-    },
-    name: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    workoutImage: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    type: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-});
+export const WorkoutRecord = sequelize.define<Model<WorkoutRecordType>>(
+    "WorkoutRecord",
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            allowNull: false,
+            primaryKey: true,
+        },
+        name: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        workoutImage: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        type: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        routineRecordId: {
+            // userId 속성 추가
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "routinerecords",
+                key: "id",
+            },
+            onUpdate: "CASCADE",
+            onDelete: "CASCADE",
+        },
+    }
+);
 
 export async function getAll(routineRecordId: number) {
     try {
@@ -40,9 +65,7 @@ type CreateWorkoutRecordRequest = {
     type: string;
     routineRecordId: string;
 };
-export async function createOne(
-    createWorkoutConfigRequest: CreateWorkoutRecordRequest
-) {
+export async function createOne(createWorkoutConfigRequest: any) {
     try {
         const data = await WorkoutRecord.create(createWorkoutConfigRequest);
         return data.dataValues;
