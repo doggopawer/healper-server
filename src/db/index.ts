@@ -1,14 +1,5 @@
-import { Sequelize } from "sequelize";
-import { config } from "../config";
+import mongoose from "mongoose";
+const connectDB = () =>
+    mongoose.connect("mongodb://localhost:27017/healper-db");
 
-const { host, user, password, database } = config.db;
-
-export const sequelize = new Sequelize(
-  database as string,
-  user as string,
-  password,
-  {
-    host,
-    dialect: "mysql",
-  }
-);
+export default connectDB;
