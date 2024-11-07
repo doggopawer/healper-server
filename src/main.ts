@@ -46,7 +46,7 @@ app.post("/upload-image", upload.single("image"), Controller.uploadImage);
 
 connectDB()
     .then(() => {
-        https.createServer(options, app).listen(4000, () => {
+        https.createServer(options, app).listen(443, () => {
             console.log("HTTPS server is running at https://localhost:4000");
         });
 
