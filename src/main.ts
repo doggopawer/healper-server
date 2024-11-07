@@ -66,6 +66,6 @@ connectDB()
         //         console.error("Error saving Document:", err);
         //     });
     })
-    .catch(() => {
-        console.error("Unable to connect to the database.");
+    .catch((e) => {
+        console.error(e);
     });
