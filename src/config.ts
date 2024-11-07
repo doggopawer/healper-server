@@ -26,6 +26,7 @@ type Config = {
         region: string | undefined;
         bucket: string | undefined;
     };
+    clientUrl: string | undefined;
 };
 
 export const config: Config = {
@@ -54,4 +55,5 @@ export const config: Config = {
         region: process.env.AWS_REGION,
         bucket: process.env.AWS_BUCKET_NAME,
     },
+    clientUrl: process.env.HEALPER_CLIENT_URL,
 };

@@ -37,14 +37,12 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
     // 에러 처리
     if (error === "access_denied") {
         // 사용자가 로그인을 취소한 경우
-        return res.redirect(`http://localhost:3000/login?error=access_denied`);
+        return res.redirect(`${config.clientUrl}/login?error=access_denied`);
     }
 
     if (!code) {
         // code가 없는 경우, 잘못된 요청 처리
-        return res.redirect(
-            `http://localhost:3000/login?error=invalid_request`
-        );
+        return res.redirect(`${config.clientUrl}/login?error=invalid_request`);
     }
 
     try {
@@ -84,7 +82,9 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
         const token = createJwtToken(id);
 
         // 클라이언트 앱으로 리디렉션
-        res.redirect(`http://localhost:3000/login?token=${token}&id=${id}`); // 클라이언트 URL을 입력하세요
+        res.redirect(
+            `http://${config.clientUrl}/login?token=${token}&id=${id}`
+        ); // 클라이언트 URL을 입력하세요
     } catch (error) {
         console.error("Error during OAuth process:", error);
         res.status(500).send("Internal Server Error");
