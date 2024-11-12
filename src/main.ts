@@ -19,27 +19,29 @@ app.use(cors());
 app.use(morgan("tiny"));
 
 // API 엔드포인트 설정
-app.get("/check", isAuth, Controller.checkAccessToken);
-app.get("/user", isAuth, Controller.getUser);
-app.get("/login", Controller.loginUser);
-app.get("/login/redirect", Controller.loginRedirectUser);
-app.post("/sync", isAuth, Controller.syncData);
+// API 엔드포인트 설정
+app.get("/api/check", isAuth, Controller.checkAccessToken);
+app.get("/api/user", isAuth, Controller.getUser);
+app.get("/api/login", Controller.loginUser); // 경로도 수정
+app.get("/api/login/redirect", Controller.loginRedirectUser); // 경로도 수정
+app.post("/api/sync", isAuth, Controller.syncData); // 경로도 수정
+
 app.delete(
-    "/routine-config/:routineConfigId",
+    "/api/routine-config/:routineConfigId",
     isAuth,
     Controller.deleteRoutineConfig
 );
 app.delete(
-    "/routine-record/:routineRecordId",
+    "/api/routine-record/:routineRecordId",
     isAuth,
     Controller.deleteRoutineRecord
 );
 app.delete(
-    "/workout-library/:workoutLibraryId",
+    "/api/workout-library/:workoutLibraryId",
     isAuth,
     Controller.deleteWorkoutLibrary
 );
-app.post("/upload-image", upload.single("image"), Controller.uploadImage);
+app.post("/api/upload-image", upload.single("image"), Controller.uploadImage);
 
 // 데이터베이스 연결 후 HTTP 서버 실행
 connectDB()
