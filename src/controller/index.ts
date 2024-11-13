@@ -287,3 +287,38 @@ export const uploadImage = async (
         res.status(200).json(data);
     });
 };
+
+// 푸시 토큰 저장 함수
+export const savePushToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { token } = req.body; // 사용자 ID와 토큰을 요청 본문에서 가져옵니다.
+    const { userId } = res.locals;
+
+    if (!userId || !token) {
+        return res.status(400).send("User ID and token are required.");
+    }
+
+    try {
+        // 사용자 정보를 업데이트하여 푸시 토큰 저장
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            userId,
+            { token }, // 푸시 토큰 업데이트
+            { new: true } // 업데이트된 문서 반환
+        );
+
+        if (!updatedUser) {
+            return res.status(404).send("User not found.");
+        }
+
+        res.status(200).json({
+            message: "Push token saved successfully",
+            user: updatedUser,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error saving push token.");
+    }
+};

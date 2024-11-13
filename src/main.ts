@@ -25,6 +25,7 @@ app.get("/api/user", isAuth, Controller.getUser);
 app.get("/api/login", Controller.loginUser); // 경로도 수정
 app.get("/api/login/redirect", Controller.loginRedirectUser); // 경로도 수정
 app.post("/api/sync", isAuth, Controller.syncData); // 경로도 수정
+app.post("/api/save_token", isAuth, Controller.savePushToken);
 
 app.delete(
     "/api/routine-config/:routineConfigId",
