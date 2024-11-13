@@ -322,3 +322,53 @@ export const savePushToken = async (
         res.status(500).send("Error saving push token.");
     }
 };
+
+export const sendPushAlarm = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { title, body } = req.body; // 클라이언트로부터 userId, title, body를 가져옵니다.
+    const { userId } = res.locals;
+
+    if (!userId || !title || !body) {
+        return res.status(400).send("User ID, title, and body are required.");
+    }
+
+    try {
+        // 사용자 정보를 가져와 푸시 토큰을 확인합니다.
+        const user = await UserModel.findById(userId);
+
+        if (!user || !user.pushToken) {
+            return res
+                .status(404)
+                .send("User not found or push token not available.");
+        }
+
+        // Expo 푸시 알림 API 호출을 위한 body 설정
+        const pushMessage = {
+            to: user.pushToken, // 사용자의 푸시 토큰
+            sound: "default",
+            title: title, // 클라이언트에서 받은 제목
+            body: body, // 클라이언트에서 받은 본문
+            data: { someData: "goes here" }, // 추가 데이터 (필요시)
+        };
+
+        // Expo 푸시 알림 API 호출
+        const response = await axios.post(
+            "https://exp.host/--/api/v2/push/send",
+            pushMessage
+        );
+
+        // API 호출 결과를 로그로 출력
+        console.log("Expo Push Notification Response:", response.data);
+
+        res.status(200).json({
+            message: "Push notification sent successfully",
+            notificationResponse: response.data,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error sending push notification.");
+    }
+};
