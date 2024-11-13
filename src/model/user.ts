@@ -8,7 +8,7 @@ export type UserType = {
     name: string;
     email: string;
     profileImage: string;
-    pushtoken?: string; // 토큰 필드 추가
+    pushToken?: string; // 토큰 필드 추가
 };
 
 // User 인터페이스
@@ -19,7 +19,7 @@ interface UserDocument extends Document {
     name: string;
     email: string;
     profileImage: string;
-    pushtoken?: string; // 토큰 필드 추가
+    pushToken?: string; // 토큰 필드 추가
 }
 
 // User 스키마
@@ -30,7 +30,7 @@ const UserSchema = new Schema<UserDocument>({
     name: { type: String, required: true },
     email: { type: String, required: true },
     profileImage: { type: String, required: true },
-    pushtoken: { type: String, required: false }, // 토큰 필드 추가
+    pushToken: { type: String, required: false }, // 토큰 필드 추가
 });
 
 // 모델 생성

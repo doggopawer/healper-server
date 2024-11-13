@@ -305,7 +305,7 @@ export const savePushToken = async (
         // 사용자 정보를 업데이트하여 푸시 토큰 저장
         const updatedUser = await UserModel.findByIdAndUpdate(
             userId,
-            { token }, // 푸시 토큰 업데이트
+            { pushToken: token }, // 푸시 토큰 업데이트
             { new: true } // 업데이트된 문서 반환
         );
 
