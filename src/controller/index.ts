@@ -8,6 +8,7 @@ import RoutineRecordModel from "../model/routine-record";
 import WorkoutLibraryModel from "../model/workout-library";
 import s3 from "../s3";
 import { ManagedUpload } from "aws-sdk/clients/s3";
+import sharp from "sharp";
 
 export const checkAccessToken = async (req: Request, res: Response) => {
     try {
@@ -104,6 +105,19 @@ export const getUser = async (req: Request, res: Response) => {
 
         // 사용자 정보 반환
         return res.status(200).json(user);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({ message: "서버 오류가 발생했습니다." });
+    }
+};
+
+export const getBaseWorkout = async (req: Request, res: Response) => {
+    try {
+        // isEditable이 false인 운동 조회
+        const workouts = await WorkoutLibraryModel.find({ isEditable: false });
+
+        // 사용자 정보 반환
+        return res.status(200).json(workouts);
     } catch (e) {
         console.error(e);
         return res.status(500).json({ message: "서버 오류가 발생했습니다." });
@@ -265,27 +279,78 @@ export const uploadImage = async (
     res: Response,
     next: NextFunction
 ) => {
-    // Multer가 처리한 파일 정보에 접근
     const file = req.file; // single 파일 업로드의 경우
     if (!file) {
         return res.status(400).send("No file uploaded.");
     }
     console.log(file);
 
-    const params = {
-        Bucket: config.s3.bucket as string,
-        Key: `uploads/${Date.now()}_${file.originalname}`, // 원래 파일 이름 사용
-        Body: file.buffer, // 파일의 버퍼
-        ContentType: file.mimetype, // 파일의 MIME 타입
-        ACL: "public-read",
-    };
+    try {
+        let processedBuffer;
+        let firstFrameBuffer;
 
-    s3.upload(params, (error: Error, data: ManagedUpload.SendData) => {
-        if (error) {
-            return res.status(500).send(error);
+        if (file.mimetype === "image/gif") {
+            // GIF에서 첫 프레임 추출 후 리사이즈
+            firstFrameBuffer = await sharp(file.buffer)
+                .png() // GIF를 PNG로 변환
+                .toBuffer();
+
+            // 첫 프레임 리사이즈
+            firstFrameBuffer = await sharp(firstFrameBuffer)
+                .resize({ width: 800, height: 800, fit: "inside" }) // 리사이즈
+                .jpeg({ quality: 80 })
+                .toBuffer();
+
+            // 리사이즈 및 압축한 GIF
+            processedBuffer = file.buffer;
+        } else {
+            // 다른 이미지 포맷에 대해 압축 및 리사이즈
+            processedBuffer = await sharp(file.buffer)
+                .resize({ width: 800, height: 800, fit: "inside" }) // 비율에 맞춰 리사이즈
+                .jpeg({ quality: 80 }) // JPEG로 변환 및 품질 설정
+                .toBuffer();
         }
-        res.status(200).json(data);
-    });
+
+        // 첫 프레임을 S3에 업로드
+
+        const firstFrameParams = {
+            Bucket: config.s3.bucket as string,
+            Key: `uploads/first-frames/${Date.now()}_${
+                file.originalname.split(".")[0]
+            }_first_frame.png`,
+            Body: firstFrameBuffer,
+            ContentType: "image/png",
+            ACL: "public-read",
+        };
+
+        const thumbnail =
+            firstFrameBuffer && (await s3.upload(firstFrameParams).promise());
+        console.log("썸넬", thumbnail);
+
+        // 리사이즈된 GIF 또는 다른 이미지 파일을 S3에 업로드
+        const processedParams = {
+            Bucket: config.s3.bucket as string,
+            Key: `uploads/processed/${Date.now()}_${file.originalname}`,
+            Body: processedBuffer,
+            ContentType:
+                file.mimetype === "image/gif" ? "image/gif" : file.mimetype,
+            ACL: "public-read",
+        };
+
+        const original = await s3.upload(processedParams).promise();
+
+        console.log(thumbnail, original);
+
+        res.status(200).json({
+            message: "Files uploaded successfully.",
+            data: {
+                thumbnail: thumbnail ? thumbnail.Location : original.Location,
+                original: original.Location,
+            },
+        });
+    } catch (error) {
+        return res.status(500).send("Error processing image: " + error);
+    }
 };
 
 // 푸시 토큰 저장 함수

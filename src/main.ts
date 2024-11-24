@@ -13,7 +13,7 @@ const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // middleware 설정
-app.use(express.json());
+app.use(express.json({ limit: "100mb" }));
 app.use(helmet());
 app.use(cors());
 app.use(morgan("tiny"));
@@ -24,6 +24,7 @@ app.get("/api/check", isAuth, Controller.checkAccessToken);
 app.get("/api/user", isAuth, Controller.getUser);
 app.get("/api/login", Controller.loginUser); // 경로도 수정
 app.get("/api/login/redirect", Controller.loginRedirectUser); // 경로도 수정
+app.get("/api/base_workout", Controller.getBaseWorkout);
 app.post("/api/sync", isAuth, Controller.syncData); // 경로도 수정
 app.post("/api/save_token", isAuth, Controller.savePushToken);
 app.post("/api/send_alarm", isAuth, Controller.sendPushAlarm);
