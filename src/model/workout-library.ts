@@ -8,7 +8,7 @@ export type WorkoutLibrary = {
     _id: string;
     name: string;
     image: string;
-    original: string;
+    originImage: string;
     category: string;
     type: string[];
     isEditable: boolean;
@@ -23,7 +23,7 @@ interface WorkoutLibraryDocument extends Document {
     _id: string;
     name: string;
     image: string;
-    original: string;
+    originImage: string;
     category: string;
     type: string[];
     isEditable: boolean;
@@ -38,7 +38,7 @@ const WorkoutLibrarySchema = new Schema<WorkoutLibraryDocument>({
     _id: { type: String, required: true },
     name: { type: String, required: true },
     image: { type: String, required: true },
-    original: { type: String, required: true },
+    originImage: { type: String, required: true },
     category: { type: String, required: true },
     type: { type: [String], required: true },
     isEditable: { type: Boolean, required: true },
