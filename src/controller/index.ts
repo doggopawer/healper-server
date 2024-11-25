@@ -262,11 +262,11 @@ export const deleteWorkoutLibrary = async (
 
         console.log(deletedWorkoutLibrary, "머야");
 
-        if (!deletedWorkoutLibrary) {
-            return res
-                .status(404)
-                .json({ message: "workout library not found" });
-        }
+        // if (!deletedWorkoutLibrary) {
+        //     return res
+        //         .status(404)
+        //         .json({ message: "workout library not found" });
+        // }
 
         res.status(200).json(deletedWorkoutLibrary);
     } catch (error) {
