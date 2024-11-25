@@ -161,10 +161,11 @@ export const syncData = async (
         console.log("RoutineRecord Result:", record);
 
         // WorkoutLibraryModel 동기화
+        console.log("유저아이디", userId);
         const workoutLibraryOps = workoutLibraries.map(
             (workoutLibrary: any) => ({
                 updateOne: {
-                    filter: { _id: workoutLibrary._id, userId }, // 사용자 ID로 필터링
+                    filter: { _id: workoutLibrary._id }, // 사용자 ID로 필터링
                     update: { $set: workoutLibrary }, // 기존 문서 업데이트
                     upsert: true, // 문서가 없으면 새로 생성
                 },
