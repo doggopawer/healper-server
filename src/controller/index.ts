@@ -98,10 +98,6 @@ export const getUser = async (req: Request, res: Response) => {
         const { userId } = res.locals; // URL 파라미터에서 사용자 ID를 가져옵니다.
         const user = await UserModel.findById(userId);
 
-        if (!isValidObjectId(userId)) {
-            throw new CustomError(ErrorDefinitions.INVALID_DATA);
-        }
-
         if (!user) {
             throw new CustomError(ErrorDefinitions.NOT_FOUND);
         }
