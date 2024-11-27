@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { config } from "../config";
 import axios from "axios";
-import { createJwtToken } from "../util";
+import { createJwtToken, handleError } from "../util";
 import UserModel from "../model/user";
 import RoutineConfigModel from "../model/routine-config";
 import RoutineRecordModel from "../model/routine-record";
@@ -9,25 +9,30 @@ import WorkoutLibraryModel from "../model/workout-library";
 import s3 from "../s3";
 import { ManagedUpload } from "aws-sdk/clients/s3";
 import sharp from "sharp";
+import { CustomError, ErrorDefinitions } from "../types/error";
+import { isValidObjectId } from "mongoose";
 
 export const checkAccessToken = async (req: Request, res: Response) => {
     try {
-        res.status(200).json({ message: "access token is valid" });
-    } catch (error) {
-        console.error("Error deleting routine record:", error);
-        res.status(500).json({ message: "Internal server error", error });
+        res.status(200).json({ message: "토큰이 유효합니다." });
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-    const { clientId, redirectUrl } = config.oauth.google;
-    let url = "https://accounts.google.com/o/oauth2/v2/auth";
-    url += `?client_id=${clientId}`;
-    url += `&redirect_uri=${redirectUrl}`;
-    url += "&response_type=code";
-    url += "&scope=email profile";
-    console.log("loginUser");
-    res.redirect(url);
+    try {
+        const { clientId, redirectUrl } = config.oauth.google;
+        let url = "https://accounts.google.com/o/oauth2/v2/auth";
+        url += `?client_id=${clientId}`;
+        url += `&redirect_uri=${redirectUrl}`;
+        url += "&response_type=code";
+        url += "&scope=email profile";
+        console.log("loginUser");
+        res.redirect(url);
+    } catch (e) {
+        handleError(res, e);
+    }
 };
 
 export const loginRedirectUser = async (req: Request, res: Response) => {
@@ -35,7 +40,6 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
         config.oauth.google;
     const { code, error } = req.query;
 
-    // 에러 처리
     if (error === "access_denied") {
         // 사용자가 로그인을 취소한 경우
         return res.redirect(`${config.clientUrl}/login?error=access_denied`);
@@ -84,43 +88,38 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
 
         // 클라이언트 앱으로 리디렉션
         res.redirect(`${config.clientUrl}/login?token=${token}&id=${id}`); // 클라이언트 URL을 입력하세요
-    } catch (error) {
-        console.error("Error during OAuth process:", error);
-        res.status(500).send("Internal Server Error");
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
 export const getUser = async (req: Request, res: Response) => {
     try {
         const { userId } = res.locals; // URL 파라미터에서 사용자 ID를 가져옵니다.
-
-        // 사용자 조회
         const user = await UserModel.findById(userId);
 
-        if (!user) {
-            return res
-                .status(404)
-                .json({ message: "사용자를 찾을 수 없습니다." });
+        if (!isValidObjectId(userId)) {
+            throw new CustomError(ErrorDefinitions.INVALID_DATA);
         }
 
-        // 사용자 정보 반환
+        if (!user) {
+            throw new CustomError(ErrorDefinitions.NOT_FOUND);
+        }
         return res.status(200).json(user);
     } catch (e) {
-        console.error(e);
-        return res.status(500).json({ message: "서버 오류가 발생했습니다." });
+        handleError(res, e);
     }
 };
 
 export const getBaseWorkout = async (req: Request, res: Response) => {
     try {
-        // isEditable이 false인 운동 조회
         const workouts = await WorkoutLibraryModel.find({ isEditable: false });
-
-        // 사용자 정보 반환
+        if (!workouts) {
+            throw new CustomError(ErrorDefinitions.NOT_FOUND);
+        }
         return res.status(200).json(workouts);
     } catch (e) {
-        console.error(e);
-        return res.status(500).json({ message: "서버 오류가 발생했습니다." });
+        handleError(res, e);
     }
 };
 
@@ -133,7 +132,10 @@ export const syncData = async (
         // 클라이언트에서 보낸 모든 데이터 가져오기
         const { routineConfigs, routineRecords, workoutLibraries } = req.body;
         const { userId } = res.locals; // 현재 사용자 ID 가져오기
-        console.log(userId);
+
+        if (!isValidObjectId(userId)) {
+            throw new CustomError(ErrorDefinitions.INVALID_DATA);
+        }
 
         // RoutineConfigModel 동기화
         const routineConfigOps = routineConfigs.map((routineConfig: any) => ({
@@ -157,11 +159,9 @@ export const syncData = async (
         }));
 
         // 클라이언트의 데이터를 서버에 추가하거나 업데이트
-        const record = await RoutineRecordModel.bulkWrite(routineRecordOps);
-        console.log("RoutineRecord Result:", record);
+        await RoutineRecordModel.bulkWrite(routineRecordOps);
 
         // WorkoutLibraryModel 동기화
-        console.log("유저아이디", userId);
         const workoutLibraryOps = workoutLibraries.map(
             (workoutLibrary: any) => ({
                 updateOne: {
@@ -184,14 +184,12 @@ export const syncData = async (
 
         // 성공적으로 가져온 경우
         res.status(200).json({
-            message: "Data synchronized successfully",
             routineConfigs: updatedRoutineConfigs, // 업데이트된 데이터를 반환
             routineRecords: updatedRoutineRecords,
             workoutLibraries: updatedWorkoutLibraries,
         });
-    } catch (error) {
-        console.error(error); // 에러 로그
-        res.status(500).json({ message: "Internal server error", error });
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
@@ -203,22 +201,17 @@ export const deleteRoutineConfig = async (
     try {
         const { routineConfigId } = req.params;
 
+        if (!routineConfigId) {
+            throw new CustomError(ErrorDefinitions.INVALID_DATA);
+        }
         // MongoDB에서 문서 삭제
         const deletedConfig = await RoutineConfigModel.findOneAndDelete({
             _id: routineConfigId,
         });
-        console.log(routineConfigId, deletedConfig);
-
-        // if (!deletedConfig) {
-        //     return res
-        //         .status(404)
-        //         .json({ message: "Routine config not found" });
-        // }
 
         res.status(200).json(deletedConfig);
-    } catch (error) {
-        console.error("Error deleting routine config:", error); // 오류 로그
-        res.status(500).json({ message: "Internal server error", error });
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
@@ -230,20 +223,17 @@ export const deleteRoutineRecord = async (
     try {
         const { routineRecordId } = req.params;
 
+        if (!routineRecordId) {
+            throw new CustomError(ErrorDefinitions.INVALID_DATA);
+        }
+
         const deletedRecord = await RoutineRecordModel.findOneAndDelete({
             _id: routineRecordId,
         });
 
-        // if (!deletedRecord) {
-        //     return res
-        //         .status(404)
-        //         .json({ message: "Routine record not found" });
-        // }
-
         res.status(200).json(deletedRecord);
-    } catch (error) {
-        console.error("Error deleting routine record:", error);
-        res.status(500).json({ message: "Internal server error", error });
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
@@ -255,23 +245,18 @@ export const deleteWorkoutLibrary = async (
     try {
         const { workoutLibraryId } = req.params;
 
+        if (!workoutLibraryId) {
+            throw new CustomError(ErrorDefinitions.INVALID_DATA);
+        }
+
         const deletedWorkoutLibrary =
             await WorkoutLibraryModel.findOneAndDelete({
                 _id: workoutLibraryId,
             });
 
-        console.log(deletedWorkoutLibrary, "머야");
-
-        // if (!deletedWorkoutLibrary) {
-        //     return res
-        //         .status(404)
-        //         .json({ message: "workout library not found" });
-        // }
-
         res.status(200).json(deletedWorkoutLibrary);
-    } catch (error) {
-        console.error("Error deleting routine record:", error);
-        res.status(500).json({ message: "Internal server error", error });
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
@@ -282,9 +267,8 @@ export const uploadImage = async (
 ) => {
     const file = req.file; // single 파일 업로드의 경우
     if (!file) {
-        return res.status(400).send("No file uploaded.");
+        throw new CustomError(ErrorDefinitions.INVALID_DATA);
     }
-    console.log(file);
 
     try {
         let processedBuffer;
@@ -326,7 +310,6 @@ export const uploadImage = async (
 
         const thumbnail =
             firstFrameBuffer && (await s3.upload(firstFrameParams).promise());
-        console.log("썸넬", thumbnail);
 
         // 리사이즈된 GIF 또는 다른 이미지 파일을 S3에 업로드
         const processedParams = {
@@ -349,8 +332,8 @@ export const uploadImage = async (
                 original: original.Location,
             },
         });
-    } catch (error) {
-        return res.status(500).send("Error processing image: " + error);
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
@@ -364,7 +347,7 @@ export const savePushToken = async (
     const { userId } = res.locals;
 
     if (!userId || !token) {
-        return res.status(400).send("User ID and token are required.");
+        throw new CustomError(ErrorDefinitions.INVALID_DATA);
     }
 
     try {
@@ -376,16 +359,14 @@ export const savePushToken = async (
         );
 
         if (!updatedUser) {
-            return res.status(404).send("User not found.");
+            throw new CustomError(ErrorDefinitions.NOT_FOUND);
         }
 
         res.status(200).json({
-            message: "Push token saved successfully",
             user: updatedUser,
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error saving push token.");
+    } catch (e) {
+        handleError(res, e);
     }
 };
 
@@ -398,7 +379,7 @@ export const sendPushAlarm = async (
     const { userId } = res.locals;
 
     if (!userId || !title || !body) {
-        return res.status(400).send("User ID, title, and body are required.");
+        throw new CustomError(ErrorDefinitions.INVALID_DATA);
     }
 
     try {
@@ -406,9 +387,7 @@ export const sendPushAlarm = async (
         const user = await UserModel.findById(userId);
 
         if (!user || !user.pushToken) {
-            return res
-                .status(404)
-                .send("User not found or push token not available.");
+            throw new CustomError(ErrorDefinitions.NOT_FOUND);
         }
 
         // Expo 푸시 알림 API 호출을 위한 body 설정
@@ -426,15 +405,10 @@ export const sendPushAlarm = async (
             pushMessage
         );
 
-        // API 호출 결과를 로그로 출력
-        console.log("Expo Push Notification Response:", response.data);
-
         res.status(200).json({
-            message: "Push notification sent successfully",
             notificationResponse: response.data,
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error sending push notification.");
+    } catch (e) {
+        handleError(res, e);
     }
 };
