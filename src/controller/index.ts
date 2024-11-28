@@ -129,9 +129,9 @@ export const syncData = async (
         const { routineConfigs, routineRecords, workoutLibraries } = req.body;
         const { userId } = res.locals; // 현재 사용자 ID 가져오기
 
-        if (!isValidObjectId(userId)) {
-            throw new CustomError(ErrorDefinitions.INVALID_DATA);
-        }
+        // if (!isValidObjectId(userId)) {
+        //     throw new CustomError(ErrorDefinitions.INVALID_DATA);
+        // }
 
         // RoutineConfigModel 동기화
         const routineConfigOps = routineConfigs.map((routineConfig: any) => ({
