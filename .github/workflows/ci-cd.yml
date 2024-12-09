@@ -25,7 +25,7 @@ jobs:
               run: npm install
 
             - name: Build Docker image
-              run: docker build -t healper-server -f ../../Dockerfile ../../
+              run: docker build -t healper-server -f Dockerfile .
     deploy:
         runs-on: ubuntu-latest
         needs: build # build 작업이 완료된 후에 실행
