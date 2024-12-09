@@ -1,0 +1,64 @@
+name: CI/CD Pipeline
+
+on:
+    push:
+        branches:
+            - main # main 브랜치에 푸시할 때 트리거
+    pull_request:
+        branches:
+            - main # main 브랜치에 PR 생성 시 트리거
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: "14"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build Docker image
+              run: docker build -t healper-server ../../
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: build # build 작업이 완료된 후에 실행
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Login to Docker Hub
+              run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+            - name: Push Docker image
+              run: docker push healper-server # Docker Hub에 이미지 푸시
+
+            - name: Create PEM file
+              run: echo "${{ secrets.MY_PEM_FILE }}" > my-key.pem
+
+            - name: Deploy to server
+              env:
+              DB_USER: ${{ secrets.DB_USER }}
+              DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+              JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+              JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+              GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+              GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+              GOOGLE_REDIRECT_URL: ${{ secrets.GOOGLE_REDIRECT_URL }}
+              HEALPER_CLIENT_URL: ${{ secrets.HEALPER_CLIENT_URL }}
+              GOOGLE_TOKEN_URL: ${{ secrets.GOOGLE_TOKEN_URL }}
+              GOOGLE_USERINFO_URL: ${{ secrets.GOOGLE_USERINFO_URL }}
+              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              AWS_REGION: ${{ secrets.AWS_REGION }}
+              AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+              run: |
+                  ssh -i my-key.pem ubuntu@43.202.106.124 "docker pull healper-server && docker run -d -p 3000:3000 healper-server"
