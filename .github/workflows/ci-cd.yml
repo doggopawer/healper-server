@@ -60,4 +60,4 @@ jobs:
                   AWS_REGION: ${{ secrets.AWS_REGION }}
                   AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
               run: |
-                  ssh -i my-key.pem ubuntu@43.202.106.124 "docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server:a02a6ee && docker run -d -p 3000:3000 ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server:a02a6ee"
+                  ssh -i my-key.pem ubuntu@43.202.106.124 "docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server && docker run -d -p 3000:3000 ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server"
