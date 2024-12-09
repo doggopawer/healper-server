@@ -44,7 +44,7 @@ jobs:
               run: echo "${{ secrets.MY_PEM_FILE }}" > my-key.pem
 
             - name: Set permissions for PEM file
-              run: chmod 777 my-key.pem
+              run: chmod 400 my-key.pem
 
             - name: Deploy to server
               env:
