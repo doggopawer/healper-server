@@ -41,7 +41,10 @@ jobs:
               uses: actions/checkout@v2
 
             - name: Create PEM file
-              run: echo "${{ secrets.MY_PEM_FILE }}" > my-key.pem
+              run: printf "%s" "${{ secrets.MY_PEM_FILE }}" > my-key.pem
+
+            - name: Set permissions for PEM file
+              run: chmod 600 my-key.pem
 
             - name: Deploy to server
               env:
