@@ -25,13 +25,13 @@ jobs:
               run: npm install
 
             - name: Build Docker image
-              run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server -f Dockerfile .
+              run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server:latest -f Dockerfile .
 
             - name: Login to Docker Hub
               run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
             - name: Push Docker image
-              run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server # Docker Hub에 이미지 푸시
+              run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server:latest # Docker Hub에 이미지 푸시
     deploy:
         runs-on: ubuntu-latest
         needs: build # build 작업이 완료된 후에 실행
@@ -63,4 +63,4 @@ jobs:
                   AWS_REGION: ${{ secrets.AWS_REGION }}
                   AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
               run: |
-                  ssh -i my-key.pem -o StrictHostKeyChecking=no ubuntu@43.202.106.124 "docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server && docker run -d -p 3000:3000 ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server"
+                  ssh -i my-key.pem -o StrictHostKeyChecking=no ubuntu@43.202.106.124 "docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server:latest && docker run -d -p 3000:3000 ${{ secrets.DOCKER_HUB_USERNAME }}/healper-server:latest"
