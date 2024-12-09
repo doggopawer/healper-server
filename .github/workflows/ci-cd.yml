@@ -38,7 +38,7 @@ jobs:
               run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
             - name: Push Docker image
-              run: docker push healper-server:latest # Docker Hub에 이미지 푸시
+              run: docker push healper-server:latest . # Docker Hub에 이미지 푸시
 
             - name: Create PEM file
               run: echo "${{ secrets.MY_PEM_FILE }}" > my-key.pem
