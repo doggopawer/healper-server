@@ -2,10 +2,11 @@
 FROM node:20
 
 # 작업 디렉토리를 설정합니다.
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # package.json과 package-lock.json을 복사합니다.
-COPY package*.json ./
+COPY ./package.json ./
+COPY ./package-lock.json ./
 
 # 의존성을 설치합니다.
 RUN npm install
