@@ -84,12 +84,38 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
         }
 
         // JWT 토큰 생성
-        const token = createJwtToken(id);
+        console.log("토큰토큰", tokenUrlResponse.data.access_token);
+        const token = createJwtToken(id, tokenUrlResponse.data.access_token);
 
         // 클라이언트 앱으로 리디렉션
         res.redirect(`${config.clientUrl}/login?token=${token}&id=${id}`); // 클라이언트 URL을 입력하세요
     } catch (e) {
         handleError(res, e);
+    }
+};
+
+
+export const signOutUser = async (req: Request, res: Response) => {
+    // 사용자 토큰 및 ID를 가져옵니다.
+    const { userId, oauthToken } = res.locals;
+
+    console.log("과연 제발...", oauthToken);
+    if (!oauthToken) {
+        return res.status(401).send('인증 토큰이 필요합니다.');
+    }
+
+    try {
+        // Google API에 사용자 삭제 요청
+        await axios.get(`https://accounts.google.com/o/oauth2/revoke?token=${oauthToken}`);
+
+        // 로컬 데이터베이스에서 사용자 정보 삭제
+        await UserModel.findByIdAndDelete(userId);
+
+        // 클라이언트에게 성공 응답
+        res.status(204).send(); // 성공적으로 삭제된 경우 No Content 반환
+    } catch (error) {
+        console.error('회원 탈퇴 중 오류 발생:', error);
+        res.status(500).send('회원 탈퇴 중 문제가 발생했습니다.');
     }
 };
 

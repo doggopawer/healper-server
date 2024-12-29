@@ -28,6 +28,7 @@ app.get("/api/base_workout", Controller.getBaseWorkout);
 app.post("/api/sync", isAuth, Controller.syncData); // 경로도 수정
 app.post("/api/save_token", isAuth, Controller.savePushToken);
 app.post("/api/send_alarm", isAuth, Controller.sendPushAlarm);
+app.post("/api/signout/", isAuth, Controller.signOutUser);
 
 app.delete(
     "/api/routine-config/:routineConfigId",
