@@ -110,6 +110,14 @@ export const signOutUser = async (req: Request, res: Response) => {
 
         // 로컬 데이터베이스에서 사용자 정보 삭제
         await UserModel.findByIdAndDelete(userId);
+        // 운동 설정 전체 삭제
+        await RoutineConfigModel.deleteMany({ userId });
+
+        // 운동 기록 전체 삭제
+        await RoutineRecordModel.deleteMany({ userId });
+
+        // 운동 종목 전체 삭제
+        await WorkoutLibraryModel.deleteMany({ userId });
 
         // 클라이언트에게 성공 응답
         res.status(204).send(); // 성공적으로 삭제된 경우 No Content 반환
