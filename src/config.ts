@@ -19,6 +19,13 @@ type Config = {
             tokenUrl: string | undefined;
             userInfoUrl: string | undefined;
         };
+        apple: {
+            clientId: string | undefined;
+            privateKey: string | undefined;
+            privateKeyId: string | undefined;
+            redirectUrl: string | undefined;
+            teamId: string | undefined;
+        }
     };
     s3: {
         accessKey: string | undefined;
@@ -48,6 +55,13 @@ export const config: Config = {
             tokenUrl: process.env.GOOGLE_TOKEN_URL,
             userInfoUrl: process.env.GOOGLE_USERINFO_URL,
         },
+        apple: {
+            clientId: process.env.APPLE_CLIENT_ID,
+            privateKey: process.env.APPLE_PRIVATE_KEY,
+            privateKeyId: process.env.APPLE_PRIVATE_KEY_ID,
+            redirectUrl: process.env.APPLE_REDIRECT_URL,
+            teamId: process.env.APPLE_TEAM_ID,
+        }
     },
     s3: {
         accessKey: process.env.AWS_ACCESS_KEY_ID,

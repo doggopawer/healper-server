@@ -23,6 +23,8 @@ app.use(morgan("tiny"));
 app.get("/api/check", isAuth, Controller.checkAccessToken);
 app.get("/api/user", isAuth, Controller.getUser);
 app.get("/api/login", Controller.loginUser); // 경로도 수정
+app.get("/api/login/apple", Controller.loginApple); // 경로도 수정
+app.post("/api/login/redirect/apple", Controller.loginRedirectApple);
 app.get("/api/login/redirect", Controller.loginRedirectUser); // 경로도 수정
 app.get("/api/base_workout", Controller.getBaseWorkout);
 app.post("/api/sync", isAuth, Controller.syncData); // 경로도 수정

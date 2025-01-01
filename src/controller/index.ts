@@ -7,10 +7,12 @@ import RoutineConfigModel from "../model/routine-config";
 import RoutineRecordModel from "../model/routine-record";
 import WorkoutLibraryModel from "../model/workout-library";
 import s3 from "../s3";
-import { ManagedUpload } from "aws-sdk/clients/s3";
 import sharp from "sharp";
 import { CustomError, ErrorDefinitions } from "../types/error";
-import { isValidObjectId } from "mongoose";
+import {readFileSync} from 'fs'
+import path from "path";
+import jwt from "jsonwebtoken";
+import qs from "qs";
 
 export const checkAccessToken = async (req: Request, res: Response) => {
     try {
@@ -34,6 +36,22 @@ export const loginUser = async (req: Request, res: Response) => {
         handleError(res, e);
     }
 };
+
+export const loginApple = async (req: Request, res: Response) => {
+    try {
+        const { clientId, redirectUrl } = config.oauth.apple; // Apple Service ID와 Redirect URI 가져오기
+        let url = "https://appleid.apple.com/auth/authorize";
+        url += `?client_id=${clientId}`; // 클라이언트 ID 추가
+        url += `&response_mode=form_post`; // 응답 모드 설정
+        url += `&response_type=code`; // 응답 타입 설정
+        url += `&scope=name email`; // 요청할 스코프 설정
+        url += `&redirect_uri=${redirectUrl}`; // 리다이렉트 URI 추가
+        res.redirect(url); // 생성된 URL로 리디렉션
+    } catch (e) {
+        handleError(res, e); // 에러 처리
+    }
+};
+
 
 export const loginRedirectUser = async (req: Request, res: Response) => {
     const { clientId, clientSecret, redirectUrl, tokenUrl, userInfoUrl } =
@@ -93,6 +111,69 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
         handleError(res, e);
     }
 };
+
+
+export const loginRedirectApple = async (req: Request, res: Response) => {
+    const { clientId, privateKey:pKey, redirectUrl, teamId, privateKeyId } =
+        config.oauth.apple;
+    try {
+        const code = req.body.code as string;
+
+    const privateKey = pKey as string;    
+
+    const currTime = Math.floor(Date.now() / 1000);
+    // JWT를 생성하기 위한 클라이언트 시크릿
+    const appleOAuthClientSecret = jwt.sign(
+      {
+        // 애플 개발자 팀 ID
+        iss: teamId,
+        // JWT 생성 시간
+        iat: currTime,
+        // JWT 만료 시간 (약 6개월 후)
+        exp: currTime + 15777000,
+        // 대상 (애플 ID 서비스)
+        aud: 'https://appleid.apple.com',
+        // 서비스 ID (애플에서 등록한 앱의 ID)
+        sub: clientId,
+      },
+      privateKey,
+      {
+        // 서명 알고리즘 (ES256)
+        algorithm: 'ES256',
+        // 개인 키 ID
+        keyid: privateKeyId
+      }
+    );
+
+    // 애플의 토큰 엔드포인트에 POST 요청을 위한 파라미터 설정
+    const params = qs.stringify({
+      // 클라이언트 ID (애플 서비스 ID)
+      client_id: clientId,
+      // 생성한 클라이언트 시크릿
+      client_secret: appleOAuthClientSecret,
+      // 전달받은 authorization code
+      code,
+      // grant_type (authorization_code)
+      grant_type: 'authorization_code',
+      // 리다이렉트 URI (애플 로그인 후 돌아올 URI)
+      redirect_uri: redirectUrl,
+    });
+
+    // 애플의 토큰 엔드포인트에 POST 요청
+    const validateAuthorizationCodeRequest = await axios.post(
+      'https://appleid.apple.com/auth/token',
+      params
+    );
+    console.log("애플 토큰 결과", validateAuthorizationCodeRequest.data)
+
+    res.status(200).send('ok')
+
+    }catch(e) {
+
+    }
+
+
+}
 
 
 export const signOutUser = async (req: Request, res: Response) => {
