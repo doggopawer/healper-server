@@ -56,7 +56,7 @@ export const config: Config = {
             userInfoUrl: process.env.GOOGLE_USERINFO_URL,
         },
         apple: {
-            clientId: process.env.APPLE_CLIENT_ID,
+            clientId: process.env.APPLE_SERVICE_ID,
             privateKey: process.env.APPLE_PRIVATE_KEY,
             privateKeyId: process.env.APPLE_PRIVATE_KEY_ID,
             redirectUrl: process.env.APPLE_REDIRECT_URL,
