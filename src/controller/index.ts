@@ -123,71 +123,71 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
     const { clientId, privateKeyId, privateKeyFileName, redirectUrl, teamId } =
         config.oauth.apple;
 
-    console.log("모든 값", clientId, privateKeyId, privateKeyFileName, redirectUrl, teamId, privateKeyId);    
+    console.log("모든 값", clientId, privateKeyId, privateKeyFileName, redirectUrl, teamId);    
     try {
         const code = req.body.code as string;
         console.log("바디", req.body);
 
-    const privateKey = readFileSync(path.join(process.cwd(),  privateKeyFileName as string)).toString('utf-8');
-    console.log("prvateKey", privateKey);
-    console.log("code", code);
+        const privateKey = readFileSync(path.join(process.cwd(), privateKeyFileName as string)).toString('utf-8');
+        console.log("privateKey", privateKey);
+        console.log("code", code);
 
-    const currTime = Math.floor(Date.now() / 1000);
-    // JWT를 생성하기 위한 클라이언트 시크릿
+        const currTime = Math.floor(Date.now() / 1000);
 
-    const header = {
-        alg: 'ES256',
-        kid: privateKeyId
-    };
-    const payload ={
-        // 애플 개발자 팀 ID
-        iss: teamId,
-        // JWT 생성 시간
-        iat: currTime,
-        // JWT 만료 시간 (약 6개월 후)
-        exp: currTime + 15777000,
-        // 대상 (애플 ID 서비스)
-        aud: 'https://appleid.apple.com',
-        // 서비스 ID (애플에서 등록한 앱의 ID)
-        sub: clientId,
-      }
-        
+        const header = {
+            alg: 'ES256',
+            kid: privateKeyId
+        };
+        const payload = {
+            iss: teamId,
+            iat: currTime,
+            exp: currTime + 15777000,
+            aud: 'https://appleid.apple.com',
+            sub: clientId,
+        };
 
-    const appleOAuthClientSecret = jwt.sign(
-      payload,
-      privateKey,
-      {header}
-    );
+        const appleOAuthClientSecret = jwt.sign(
+            payload,
+            privateKey,
+            { header }
+        );
 
-    // 애플의 토큰 엔드포인트에 POST 요청을 위한 파라미터 설정
-    const params = qs.stringify({
-      // 클라이언트 ID (애플 서비스 ID)
-      client_id: clientId,
-      // 생성한 클라이언트 시크릿
-      client_secret: appleOAuthClientSecret,
-      // 전달받은 authorization code
-      code,
-      // grant_type (authorization_code)
-      grant_type: 'authorization_code',
-      // 리다이렉트 URI (애플 로그인 후 돌아올 URI)
-      redirect_uri: redirectUrl,
-    });
+        const params = qs.stringify({
+            client_id: clientId,
+            client_secret: appleOAuthClientSecret,
+            code,
+            grant_type: 'authorization_code',
+            redirect_uri: redirectUrl,
+        });
 
-    // 애플의 토큰 엔드포인트에 POST 요청
-    const validateAuthorizationCodeRequest = await axios.post(
-      'https://appleid.apple.com/auth/token',
-      params
-    );
-    console.log("애플 토큰 결과", validateAuthorizationCodeRequest.data)
+        const validateAuthorizationCodeRequest = await axios.post(
+            'https://appleid.apple.com/auth/token',
+            params
+        );
+        console.log("애플 토큰 결과", validateAuthorizationCodeRequest.data);
 
-    res.status(200).send('ok')
+        // id_token 디코드
+        const idToken = validateAuthorizationCodeRequest.data.id_token;
+        const decodedIdToken = parseJwt(idToken);
+        console.log("디코드된 id_token", decodedIdToken);
 
-    }catch(e) {
-    console.error("애플 로그인 에러:", e);
-    res.status(500).send('Internal Server Error');
+        res.status(200).send('ok');
+
+    } catch (e) {
+        console.error("애플 로그인 에러:", e);
+        res.status(500).send('Internal Server Error');
     }
+};
 
+// JWT 디코드 함수
+function parseJwt(token:string) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
 
+    return JSON.parse(jsonPayload);
 }
 
 
