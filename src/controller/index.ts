@@ -39,7 +39,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const loginApple = async (req: Request, res: Response) => {
     try {
-        const { clientId, redirectUrl } = config.oauth.apple; // Apple Service ID와 Redirect URI 가져오기
+        const { clientId, redirectUrl, privateKey } = config.oauth.apple; // Apple Service ID와 Redirect URI 가져오기
+        console.log("키키", privateKey)
         let url = "https://appleid.apple.com/auth/authorize";
         url += `?client_id=${clientId}`; // 클라이언트 ID 추가
         url += `&response_mode=form_post`; // 응답 모드 설정
