@@ -122,6 +122,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
         const code = req.body.code as string;
 
     const privateKey = readFileSync(path.join(process.cwd(),  privateKeyFileName as string));
+    console.log("prvateKey", privateKey);
 
     const currTime = Math.floor(Date.now() / 1000);
     // JWT를 생성하기 위한 클라이언트 시크릿
