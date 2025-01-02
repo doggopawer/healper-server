@@ -37,16 +37,22 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 };
 
-export const loginApple = async (req: Request, res: Response) => {
+export const loginApple = (req: Request, res: Response) => {
     try {
         const { clientId, redirectUrl } = config.oauth.apple; // Apple Service ID와 Redirect URI 가져오기
-        let url = "https://appleid.apple.com/auth/authorize";
-        url += `?client_id=${clientId}`; // 클라이언트 ID 추가
-        url += `&response_mode=form_post`; // 응답 모드 설정
-        url += `&response_type=code`; // 응답 타입 설정
-        url += `&scope=name email`; // 요청할 스코프 설정
-        url += `&redirect_uri=${redirectUrl}`; // 리다이렉트 URI 추가
-        res.redirect(url); // 생성된 URL로 리디렉션
+        const url = new URL('https://appleid.apple.com/auth/authorize');
+
+        const queryParams = qs.stringify({
+            client_id: clientId,
+            response_mode: 'form_post',
+            response_type: 'code',
+            scope: 'name email',
+            redirect_uri: redirectUrl,
+        });
+
+        url.search = queryParams; // 쿼리 파라미터 추가
+
+        res.redirect(url.toString()); // 생성된 URL로 리디렉션
     } catch (e) {
         handleError(res, e); // 에러 처리
     }
@@ -120,6 +126,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
     console.log("모든 값", clientId, privateKeyId, privateKeyFileName, redirectUrl, teamId, privateKeyId);    
     try {
         const code = req.body.code as string;
+        console.log("바디", req.body);
 
     const privateKey = readFileSync(path.join(process.cwd(),  privateKeyFileName as string)).toString('utf-8');
     console.log("prvateKey", privateKey);
