@@ -126,8 +126,12 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
 
     const currTime = Math.floor(Date.now() / 1000);
     // JWT를 생성하기 위한 클라이언트 시크릿
-    const appleOAuthClientSecret = jwt.sign(
-      {
+
+    const header = {
+        alg: 'ES256',
+        kid: privateKeyId
+    };
+    const payload ={
         // 애플 개발자 팀 ID
         iss: teamId,
         // JWT 생성 시간
@@ -138,14 +142,13 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
         aud: 'https://appleid.apple.com',
         // 서비스 ID (애플에서 등록한 앱의 ID)
         sub: clientId,
-      },
-      privateKey,
-      {
-        // 서명 알고리즘 (ES256)
-        algorithm: 'ES256',
-        // 개인 키 ID
-        keyid: privateKeyId
       }
+        
+
+    const appleOAuthClientSecret = jwt.sign(
+      payload,
+      privateKey,
+      {header}
     );
 
     // 애플의 토큰 엔드포인트에 POST 요청을 위한 파라미터 설정
