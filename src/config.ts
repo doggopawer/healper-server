@@ -21,7 +21,8 @@ type Config = {
         };
         apple: {
             clientId: string | undefined;
-            privateKey: string | undefined;
+            privateKeyFileName: string | undefined;
+            privateKey:  string | undefined;
             privateKeyId: string | undefined;
             redirectUrl: string | undefined;
             teamId: string | undefined;
@@ -57,6 +58,7 @@ export const config: Config = {
         },
         apple: {
             clientId: process.env.APPLE_SERVICE_ID,
+            privateKeyFileName: process.env.APPLE_PRIVATE_KEY_FILE_NAME,
             privateKey: process.env.APPLE_PRIVATE_KEY,
             privateKeyId: process.env.APPLE_PRIVATE_KEY_ID,
             redirectUrl: process.env.APPLE_REDIRECT_URL,

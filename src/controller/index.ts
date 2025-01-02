@@ -39,8 +39,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const loginApple = async (req: Request, res: Response) => {
     try {
-        const { clientId, redirectUrl, privateKey } = config.oauth.apple; // Apple Service ID와 Redirect URI 가져오기
-        console.log("키키", privateKey)
+        const { clientId, redirectUrl } = config.oauth.apple; // Apple Service ID와 Redirect URI 가져오기
         let url = "https://appleid.apple.com/auth/authorize";
         url += `?client_id=${clientId}`; // 클라이언트 ID 추가
         url += `&response_mode=form_post`; // 응답 모드 설정
@@ -115,14 +114,14 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
 
 
 export const loginRedirectApple = async (req: Request, res: Response) => {
-    const { clientId, privateKey:pKey, redirectUrl, teamId, privateKeyId } =
+    const { clientId, privateKeyId, privateKeyFileName, redirectUrl, teamId } =
         config.oauth.apple;
 
-    console.log("모든 값", clientId, pKey, redirectUrl, teamId, privateKeyId);    
+    console.log("모든 값", clientId, privateKeyId, privateKeyFileName, redirectUrl, teamId, privateKeyId);    
     try {
         const code = req.body.code as string;
 
-    const privateKey = pKey as string;    
+    const privateKey = readFileSync(path.join(process.cwd(),  privateKeyFileName as string));
 
     const currTime = Math.floor(Date.now() / 1000);
     // JWT를 생성하기 위한 클라이언트 시크릿
