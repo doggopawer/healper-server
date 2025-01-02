@@ -121,7 +121,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
     try {
         const code = req.body.code as string;
 
-    const privateKey = readFileSync(path.join(process.cwd(),  privateKeyFileName as string));
+    const privateKey = readFileSync(path.join(process.cwd(),  privateKeyFileName as string)).toString('utf-8');
     console.log("prvateKey", privateKey);
     console.log("code", code);
 
