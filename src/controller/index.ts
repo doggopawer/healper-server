@@ -116,6 +116,8 @@ export const loginRedirectUser = async (req: Request, res: Response) => {
 export const loginRedirectApple = async (req: Request, res: Response) => {
     const { clientId, privateKey:pKey, redirectUrl, teamId, privateKeyId } =
         config.oauth.apple;
+
+    console.log("모든 값", clientId, pKey, redirectUrl, teamId, privateKeyId);    
     try {
         const code = req.body.code as string;
 
@@ -169,7 +171,8 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
     res.status(200).send('ok')
 
     }catch(e) {
-
+    console.error("애플 로그인 에러:", e);
+    res.status(500).send('Internal Server Error');
     }
 
 
