@@ -14,6 +14,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // middleware 설정
 app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
 app.use(morgan("tiny"));
