@@ -29,7 +29,7 @@ const UserSchema = new Schema<UserDocument>({
     providerId: { type: String, required: true },
     name: { type: String, required: true },
     email: { type: String, required: true },
-    profileImage: { type: String, required: true },
+    profileImage: { type: String, required: false },
     pushToken: { type: String, required: false }, // 토큰 필드 추가
 });
 
