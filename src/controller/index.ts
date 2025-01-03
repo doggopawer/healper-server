@@ -519,11 +519,14 @@ export const savePushToken = async (
     const { token } = req.body; // 사용자 ID와 토큰을 요청 본문에서 가져옵니다.
     const { userId } = res.locals;
 
+    try {
+        console.log("정보", token, userId);
+
     if (!userId || !token) {
         throw new CustomError(ErrorDefinitions.INVALID_DATA);
     }
 
-    try {
+    
         // 사용자 정보를 업데이트하여 푸시 토큰 저장
         const updatedUser = await UserModel.findByIdAndUpdate(
             userId,
