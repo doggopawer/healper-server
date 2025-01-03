@@ -183,7 +183,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
                 email,
                 name: '사용자',
                 provider: "Apple",
-                providerId: '',
+                providerId: sub,
                 profileImage: '',
             });
 
@@ -195,8 +195,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
         res.redirect(`${config.clientUrl}/login?token=${token}&id=${sub}`);
 
     } catch (e) {
-        console.error("애플 로그인 에러:", e);
-        res.status(500).send('Internal Server Error');
+        handleError(res, e);
     }
 };
 
