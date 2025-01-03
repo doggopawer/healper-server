@@ -233,13 +233,20 @@ export const signOutUser = async (req: Request, res: Response) => {
             // Google API에 사용자 삭제 요청
             await axios.get(`https://accounts.google.com/o/oauth2/revoke?token=${oauthToken}`);
         } else if (user.provider === 'Apple') {
-            // Apple API에 사용자 삭제 요청
-            await axios.post('https://appleid.apple.com/auth/revoke', {
+
+            const data = qs.stringify({
                 client_id: clientId,
                 client_secret: clientSecret,
                 token: oauthToken,
                 token_type_hint: 'access_token',
             });
+            // Apple API에 사용자 삭제 요청
+            const response = await axios.post('https://appleid.apple.com/auth/revoke', data, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+            console.log("응답 데이터",response.data);
         } else {
             return res.status(400).send('지원하지 않는 인증 제공자입니다.');
         }
