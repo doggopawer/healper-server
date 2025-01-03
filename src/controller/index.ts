@@ -191,7 +191,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
         }
 
 
-        const token = createJwtToken(sub, access_token);
+        const token = createJwtToken(sub, access_token, clientId, appleOAuthClientSecret);
         res.redirect(`${config.clientUrl}/login?token=${token}&id=${sub}`);
 
     } catch (e) {
@@ -214,7 +214,7 @@ function parseJwt(token:string) {
 
 export const signOutUser = async (req: Request, res: Response) => {
     // 사용자 토큰 및 ID를 가져옵니다.
-    const { userId, oauthToken } = res.locals;
+    const { userId, oauthToken, clientId, clientSecret } = res.locals;
 
     console.log("과연 제발...", oauthToken);
     if (!oauthToken) {
@@ -222,8 +222,27 @@ export const signOutUser = async (req: Request, res: Response) => {
     }
 
     try {
-        // Google API에 사용자 삭제 요청
-        await axios.get(`https://accounts.google.com/o/oauth2/revoke?token=${oauthToken}`);
+
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            throw new CustomError(ErrorDefinitions.NOT_FOUND);
+        }
+
+        // provider에 따라 API 호출
+        if (user.provider === 'Google') {
+            // Google API에 사용자 삭제 요청
+            await axios.get(`https://accounts.google.com/o/oauth2/revoke?token=${oauthToken}`);
+        } else if (user.provider === 'Apple') {
+            // Apple API에 사용자 삭제 요청
+            await axios.post('https://appleid.apple.com/auth/revoke', {
+                client_id: clientId,
+                client_secret: clientSecret,
+                token: oauthToken,
+                token_type_hint: 'access_token',
+            });
+        } else {
+            return res.status(400).send('지원하지 않는 인증 제공자입니다.');
+        }
 
         // 로컬 데이터베이스에서 사용자 정보 삭제
         await UserModel.findByIdAndDelete(userId);

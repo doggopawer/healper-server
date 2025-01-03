@@ -5,8 +5,8 @@ import { CustomError, ErrorDefinitions } from "../types/error";
 import { Response } from "express";
 import { AxiosError } from "axios";
 
-export const createJwtToken = (id: string, oauthToken:string) => {
-    return jwt.sign({ id, oauthToken }, config.jwt.secretKey as string, {
+export const createJwtToken = (id: string, oauthToken:string, clientId?:string, clientSecret?:string) => {
+    return jwt.sign({ id, oauthToken, clientId, clientSecret }, config.jwt.secretKey as string, {
         expiresIn: config.jwt.expiresIn,
     });
 };
