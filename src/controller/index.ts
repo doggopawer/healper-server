@@ -184,7 +184,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
                 name: '사용자',
                 provider: "Apple",
                 providerId: sub,
-                profileImage: '',
+                profileImage: 'a',
             });
 
             await newUser.save();
@@ -195,6 +195,7 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
         res.redirect(`${config.clientUrl}/login?token=${token}&id=${sub}`);
 
     } catch (e) {
+        console.log(e);
         handleError(res, e);
     }
 };
