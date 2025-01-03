@@ -168,20 +168,31 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
 
         const access_token = validateAuthorizationCodeRequest.data.access_token;
 
-        const userInfoResponse = await axios.get('https://appleid.apple.com/auth/verify', {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
-        });
-        console.log("사용자 정보", userInfoResponse.data);
-
-
         // id_token 디코드
         const idToken = validateAuthorizationCodeRequest.data.id_token;
         const decodedIdToken = parseJwt(idToken);
         console.log("디코드된 id_token", decodedIdToken);
 
-        res.status(200).send('ok');
+
+        const { sub, email, name, picture } = decodedIdToken
+        const found = await UserModel.findById(sub);
+
+        if (!found) {
+            const newUser = new UserModel({
+                _id: sub,
+                email,
+                name: '사용자',
+                provider: "Apple",
+                providerId: '',
+                profileImage: '',
+            });
+
+            await newUser.save();
+        }
+
+
+        const token = createJwtToken(sub, access_token);
+        res.redirect(`${config.clientUrl}/login?token=${token}&id=${sub}`);
 
     } catch (e) {
         console.error("애플 로그인 에러:", e);
