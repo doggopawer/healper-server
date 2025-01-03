@@ -32,13 +32,14 @@ export const isAuth = async (
                     throw new CustomError(ErrorDefinitions.SERVER_ERROR);
                 }
                 const payload = decoded as jwt.JwtPayload;
-                const oauthToken = payload.oauthToken;
                 const user = await UserModel.findById(payload.id);
                 if (!user) {
                     throw new CustomError(ErrorDefinitions.NOT_FOUND);
                 }
                 res.locals.userId = user.id;
-                res.locals.oauthToken = oauthToken;
+                res.locals.oauthToken = payload.oauthToken;
+                res.locals.clientId = payload.clientId;
+                res.locals.clientSecret = payload.clientSecret;
                 next();
             }
         );
