@@ -166,6 +166,16 @@ export const loginRedirectApple = async (req: Request, res: Response) => {
         );
         console.log("애플 토큰 결과", validateAuthorizationCodeRequest.data);
 
+        const access_token = validateAuthorizationCodeRequest.data.access_token;
+
+        const userInfoResponse = await axios.get('https://appleid.apple.com/auth/verify', {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        });
+        console.log("사용자 정보", userInfoResponse.data);
+
+
         // id_token 디코드
         const idToken = validateAuthorizationCodeRequest.data.id_token;
         const decodedIdToken = parseJwt(idToken);
