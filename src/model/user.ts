@@ -18,7 +18,7 @@ interface UserDocument extends Document {
     providerId: string;
     name: string;
     email: string;
-    profileImage: string;
+    profileImage?: string;
     pushToken?: string; // 토큰 필드 추가
 }
 
