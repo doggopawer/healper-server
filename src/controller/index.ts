@@ -520,7 +520,8 @@ export const savePushToken = async (
     const { userId } = res.locals;
 
     try {
-        console.log("정보", token, userId);
+        console.log("토큰큰", token, userId);
+        console.log("유저아이디", token, userId);
 
     if (!userId || !token) {
         throw new CustomError(ErrorDefinitions.INVALID_DATA);
