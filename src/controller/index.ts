@@ -439,6 +439,7 @@ export const uploadImage = async (
     next: NextFunction
 ) => {
     const file = req.file; // single 파일 업로드의 경우
+    console.log("파일",file)
     if (!file) {
         throw new CustomError(ErrorDefinitions.INVALID_DATA);
     }
@@ -506,6 +507,7 @@ export const uploadImage = async (
             },
         });
     } catch (e) {
+        console.log("이미지업로드실패",e);
         handleError(res, e);
     }
 };
