@@ -439,7 +439,7 @@ export const uploadImage = async (
     next: NextFunction
 ) => {
     const file = req.file; // single 파일 업로드의 경우
-    console.log("파일",file)
+    console.log("파일", file);
     if (!file) {
         throw new CustomError(ErrorDefinitions.INVALID_DATA);
     }
@@ -471,46 +471,51 @@ export const uploadImage = async (
         }
 
         // 첫 프레임을 S3에 업로드
-
         const firstFrameParams = {
             Bucket: config.s3.bucket as string,
-            Key: `uploads/first-frames/${Date.now()}_${
-                file.originalname.split(".")[0]
-            }_first_frame.png`,
+            Key: `uploads/first-frames/${Date.now()}_${file.originalname.split(".")[0]}_first_frame.png`,
             Body: firstFrameBuffer,
             ContentType: "image/png",
             ACL: "public-read",
         };
 
-        const thumbnail =
-            firstFrameBuffer && (await s3.upload(firstFrameParams).promise());
+        const thumbnail = firstFrameBuffer && (await s3.upload(firstFrameParams).promise());
 
         // 리사이즈된 GIF 또는 다른 이미지 파일을 S3에 업로드
         const processedParams = {
             Bucket: config.s3.bucket as string,
             Key: `uploads/processed/${Date.now()}_${file.originalname}`,
             Body: processedBuffer,
-            ContentType:
-                file.mimetype === "image/gif" ? "image/gif" : file.mimetype,
+            ContentType: file.mimetype === "image/gif" ? "image/gif" : file.mimetype,
             ACL: "public-read",
         };
 
         const original = await s3.upload(processedParams).promise();
+
+        // CloudFront URL을 통해 반환
+        const cloudFrontBaseUrl = 'https://d104mujuo3zqj.cloudfront.net/'; // CloudFront의 기본 URL
+        const originalUrl = cloudFrontBaseUrl + original.Key;
+        const thumbnailUrl = thumbnail ? cloudFrontBaseUrl + thumbnail.Key : originalUrl;
+        
 
         console.log(thumbnail, original);
 
         res.status(200).json({
             message: "Files uploaded successfully.",
             data: {
-                thumbnail: thumbnail ? thumbnail.Location : original.Location,
-                original: original.Location,
+                thumbnail: thumbnailUrl,
+                original: originalUrl,
             },
         });
     } catch (e) {
-        console.log("이미지업로드실패",e);
+        console.log("이미지 업로드 실패", e);
         handleError(res, e);
     }
 };
+
+
+
+
 
 // 푸시 토큰 저장 함수
 export const savePushToken = async (
